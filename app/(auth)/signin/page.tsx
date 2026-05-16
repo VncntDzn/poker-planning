@@ -2,7 +2,7 @@
 
 import { GoogleLogin } from "@react-oauth/google"
 import axios from "axios"
-import { useEffect, useEffectEvent, useState } from "react"
+import { useEffect, useState } from "react"
 
 export default function Signin() {
   const [googleResponse, setGoogleResponse] = useState<string | undefined>("")
@@ -10,7 +10,7 @@ export default function Signin() {
   useEffect(() => {
     if (googleResponse) {
       ;(async function handleSignin() {
-        const res = await axios.post(
+        await axios.post(
           `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google-signin`,
           {
             idToken: googleResponse,
