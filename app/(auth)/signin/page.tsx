@@ -3,19 +3,32 @@
 import { GoogleLogin } from "@react-oauth/google"
 import axios from "axios"
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 
 export default function Signin() {
   const [googleResponse, setGoogleResponse] = useState<string | undefined>("")
+  const router = useRouter()
 
   useEffect(() => {
     if (googleResponse) {
       ;(async function handleSignin() {
-        await axios.post(
-          `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google-signin`,
-          {
-            idToken: googleResponse,
+        try {
+          const res = await axios.post(
+            `${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/google-signin`,
+            {
+              idToken: googleResponse,
+            },
+            {
+              withCredentials: true,
+            }
+          )
+
+          if (res.status === 200) {
+            router.push("/dashboard")
           }
-        )
+        } catch (error) {
+          console.error("Google sign in failed", error)
+        }
       })()
     }
   }, [googleResponse])
