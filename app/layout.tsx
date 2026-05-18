@@ -1,7 +1,7 @@
 import { Geist, Geist_Mono, Montserrat } from "next/font/google"
 
 import "./globals.css"
-import { ThemeProvider } from "@/common/components/theme-provider"
+import { ThemeProvider } from "@/core/providers/theme-provider"
 import { cn } from "@/lib/utils"
 import { GoogleOAuthProvider } from "@react-oauth/google"
 
