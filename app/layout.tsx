@@ -4,6 +4,7 @@ import "./globals.css"
 import { ThemeProvider } from "@/core/providers/theme-provider"
 import { cn } from "@/lib/utils"
 import { GoogleOAuthProvider } from "@react-oauth/google"
+import { TooltipProvider } from "@/common/ui/tooltip"
 
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -32,7 +33,9 @@ export default function RootLayout({
         <GoogleOAuthProvider
           clientId={process.env.NEXT_PUBLIC_API_GOOGLE_CLIENT_ID as string}
         >
-          <ThemeProvider>{children}</ThemeProvider>
+          <TooltipProvider>
+            <ThemeProvider>{children}</ThemeProvider>
+          </TooltipProvider>
         </GoogleOAuthProvider>
       </body>
     </html>
