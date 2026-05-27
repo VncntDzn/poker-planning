@@ -4,7 +4,6 @@ import {
   ArrowRight,
   Archive,
   Check,
-  Clock3,
   DoorOpen,
   Layers3,
   Lock,
@@ -79,15 +78,21 @@ const openRooms = [
 const roomStats = [
   {
     label: "Open rooms",
+    icon: DoorOpen,
     value: String(openRooms.length),
+    note: "2 rooms waiting on votes",
   },
   {
     label: "Avg. participants",
-    value: "6",
+    icon: Users,
+    value: "4.5",
+    note: "Joined per live session",
   },
   {
-    label: "Default deck",
+    label: "Most used deck",
+    icon: Layers3,
     value: "Fibonacci",
+    note: "Used in 2 open rooms",
   },
 ]
 
@@ -120,11 +125,24 @@ export default function RoomsPage() {
     <section className="mx-auto flex w-full max-w-7xl flex-col gap-6 pb-8">
       <div className="grid gap-4 md:grid-cols-3">
         {roomStats.map((stat) => (
-          <Card key={stat.label} className="border-border/70">
-            <CardHeader className="gap-1">
-              <CardDescription>{stat.label}</CardDescription>
-              <CardTitle className="text-3xl">{stat.value}</CardTitle>
+          <Card
+            key={stat.label}
+            className="border-border/70 bg-linear-to-b from-card to-muted/20"
+          >
+            <CardHeader className="gap-3">
+              <div className="flex items-start justify-between gap-3">
+                <div className="space-y-1">
+                  <CardDescription>{stat.label}</CardDescription>
+                  <CardTitle className="text-3xl">{stat.value}</CardTitle>
+                </div>
+                <div className="flex size-10 items-center justify-center rounded-2xl bg-primary/10 text-primary">
+                  <stat.icon className="size-4" />
+                </div>
+              </div>
             </CardHeader>
+            <CardContent>
+              <p className="text-sm text-muted-foreground">{stat.note}</p>
+            </CardContent>
           </Card>
         ))}
       </div>
@@ -145,13 +163,6 @@ export default function RoomsPage() {
                 mode, and a live preview so facilitators can sanity-check the
                 setup before starting.
               </p>
-              <div className="rounded-2xl border bg-muted/20 p-4">
-                <PreviewRow
-                  icon={DoorOpen}
-                  label="Default room"
-                  value="Sprint 24 Planning"
-                />
-              </div>
             </CardContent>
             <CardFooter className="gap-3">
               <CreateRoomDialog
@@ -248,37 +259,6 @@ export default function RoomsPage() {
             </CardContent>
           </Card>
 
-          <Card className="border-border/70">
-            <CardHeader>
-              <CardTitle>Room templates</CardTitle>
-              <CardDescription>
-                Reusable starting points for common scrum ceremonies.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4 md:grid-cols-3">
-              {roomTemplates.map((template) => (
-                <div
-                  key={template.name}
-                  className="rounded-2xl border bg-background p-4"
-                >
-                  <div className="space-y-3">
-                    <div className="flex size-10 items-center justify-center rounded-2xl bg-muted">
-                      <DoorOpen className="size-4 text-muted-foreground" />
-                    </div>
-                    <div className="space-y-1">
-                      <h3 className="font-medium capitalize">
-                        {template.name}
-                      </h3>
-                      <p className="text-sm leading-6 text-muted-foreground">
-                        {template.description}
-                      </p>
-                    </div>
-                    <MetaPill icon={Layers3}>{template.deck}</MetaPill>
-                  </div>
-                </div>
-              ))}
-            </CardContent>
-          </Card>
         </div>
 
         <div className="space-y-6">
@@ -308,25 +288,41 @@ export default function RoomsPage() {
 
           <Card className="border-border/70">
             <CardHeader>
-              <CardTitle>Default room preview</CardTitle>
+              <CardTitle>Templates</CardTitle>
               <CardDescription>
-                What a fresh room would roughly look like.
+                Reusable starting points for common planning sessions.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <PreviewRow
-                icon={DoorOpen}
-                label="Room name"
-                value="Sprint 24 Planning"
-              />
-              <PreviewRow icon={Layers3} label="Deck" value="Fibonacci" />
-              <PreviewRow
-                icon={Users}
-                label="Participants"
-                value="Up to 8 estimators"
-              />
-              <PreviewRow icon={Clock3} label="Mode" value="Async voting" />
+            <CardContent className="space-y-3">
+              {roomTemplates.map((template) => (
+                <div
+                  key={template.name}
+                  className="rounded-2xl border bg-background px-4 py-3"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-xl bg-muted">
+                      <DoorOpen className="size-4 text-muted-foreground" />
+                    </div>
+                    <div className="min-w-0 space-y-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3 className="font-medium capitalize">
+                          {template.name}
+                        </h3>
+                        <MetaPill icon={Layers3}>{template.deck}</MetaPill>
+                      </div>
+                      <p className="text-sm leading-6 text-muted-foreground">
+                        {template.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </CardContent>
+            <CardFooter>
+              <Button variant="outline" className="w-full">
+                Browse templates
+              </Button>
+            </CardFooter>
           </Card>
         </div>
       </div>
@@ -353,28 +349,6 @@ function StatusPill({ children }: { children: ReactNode }) {
   return (
     <div className="rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
       {children}
-    </div>
-  )
-}
-
-function PreviewRow({
-  icon: Icon,
-  label,
-  value,
-}: {
-  icon: ElementType
-  label: string
-  value: string
-}) {
-  return (
-    <div className="flex items-center gap-3">
-      <div className="flex size-9 items-center justify-center rounded-xl bg-muted">
-        <Icon className="size-4 text-muted-foreground" />
-      </div>
-      <div className="min-w-0">
-        <p className="text-xs text-muted-foreground">{label}</p>
-        <p className="truncate font-medium">{value}</p>
-      </div>
     </div>
   )
 }
