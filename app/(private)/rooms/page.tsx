@@ -2,15 +2,20 @@ import type { ElementType, ReactNode } from "react"
 
 import {
   ArrowRight,
+  Archive,
   Check,
   Clock3,
   DoorOpen,
   Layers3,
   Lock,
-  Plus,
+  MoreHorizontal,
+  Pencil,
+  Search,
+  Trash2,
   Users,
 } from "lucide-react"
 
+import { CreateRoomDialog } from "@/common/components/dialogs/create-room"
 import { Button } from "@/common/ui/button"
 import {
   Card,
@@ -20,19 +25,61 @@ import {
   CardHeader,
   CardTitle,
 } from "@/common/ui/card"
-import { Input } from "@/common/ui/input"
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/common/ui/select"
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/common/ui/dropdown-menu"
+
+const openRooms = [
+  {
+    name: "Sprint 24 Planning",
+    team: "Core Product Squad",
+    host: "Maya Chen",
+    participants: "6 / 8 joined",
+    lastActivity: "Updated 2m ago",
+    status: "Voting in progress",
+    deck: "Fibonacci",
+    visibility: "Private",
+  },
+  {
+    name: "Backlog Refinement",
+    team: "Growth Team",
+    host: "Noah Patel",
+    participants: "5 / 5 joined",
+    lastActivity: "Updated 7m ago",
+    status: "Discussion open",
+    deck: "T-shirt sizes",
+    visibility: "Team access",
+  },
+  {
+    name: "Bug Triage",
+    team: "Platform",
+    host: "Ava Garcia",
+    participants: "4 / 6 joined",
+    lastActivity: "Updated 11m ago",
+    status: "Ready to reveal",
+    deck: "1-10 linear",
+    visibility: "Private",
+  },
+  {
+    name: "Design QA Sweep",
+    team: "Experience",
+    host: "Liam Brooks",
+    participants: "3 / 6 joined",
+    lastActivity: "Updated 18m ago",
+    status: "Waiting for votes",
+    deck: "Fibonacci",
+    visibility: "Public link",
+  },
+]
 
 const roomStats = [
   {
     label: "Open rooms",
-    value: "4",
+    value: String(openRooms.length),
   },
   {
     label: "Avg. participants",
@@ -41,30 +88,6 @@ const roomStats = [
   {
     label: "Default deck",
     value: "Fibonacci",
-  },
-]
-
-const activeRooms = [
-  {
-    name: "Sprint 24 Planning",
-    team: "Core Product Squad",
-    status: "Waiting for 2 votes",
-    deck: "Fibonacci",
-    visibility: "Private",
-  },
-  {
-    name: "Backlog Refinement",
-    team: "Growth Team",
-    status: "Discussing estimates",
-    deck: "T-shirt sizes",
-    visibility: "Team access",
-  },
-  {
-    name: "Bug Triage",
-    team: "Platform",
-    status: "Ready to reveal",
-    deck: "1-10 linear",
-    visibility: "Private",
   },
 ]
 
@@ -95,34 +118,6 @@ const roomGuidelines = [
 export default function RoomsPage() {
   return (
     <section className="mx-auto flex w-full max-w-7xl flex-col gap-6 pb-8">
-      <div className="rounded-3xl border bg-card shadow-sm">
-        <div className="flex flex-col gap-6 px-6 py-6 sm:px-8 lg:flex-row lg:items-start lg:justify-between">
-          <div className="max-w-2xl space-y-3">
-            <p className="text-sm font-medium text-muted-foreground">Rooms</p>
-            <div className="space-y-2">
-              <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                Manage planning rooms
-              </h1>
-              <p className="max-w-xl text-sm leading-6 text-muted-foreground">
-                Create a room for your next scrum poker session, jump back into
-                active rooms, or start from a template your team already uses.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Button>
-              Create room
-              <Plus className="size-4" />
-            </Button>
-            <Button variant="outline">
-              Browse templates
-              <ArrowRight className="size-4" />
-            </Button>
-          </div>
-        </div>
-      </div>
-
       <div className="grid gap-4 md:grid-cols-3">
         {roomStats.map((stat) => (
           <Card key={stat.label} className="border-border/70">
@@ -138,67 +133,65 @@ export default function RoomsPage() {
         <div className="space-y-6">
           <Card className="border-border/70">
             <CardHeader>
-              <CardTitle>Create room</CardTitle>
+              <CardTitle>Start a new room</CardTitle>
               <CardDescription>
-                A lightweight setup for starting a new estimation session.
+                Launch the room setup dialog, tweak the defaults, and share the
+                invite when you are ready.
               </CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-5 md:grid-cols-2">
-              <Field label="Room name">
-                <Input placeholder="Sprint 24 planning" />
-              </Field>
-
-              <Field label="Team">
-                <Input placeholder="Core Product Squad" />
-              </Field>
-
-              <Field label="Deck">
-                <Select defaultValue="fibonacci">
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Choose a deck" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="fibonacci">Fibonacci</SelectItem>
-                    <SelectItem value="tshirt">T-shirt sizes</SelectItem>
-                    <SelectItem value="linear">1-10 linear</SelectItem>
-                  </SelectContent>
-                </Select>
-              </Field>
-
-              <Field label="Visibility">
-                <Select defaultValue="private">
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select visibility" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="private">Private invite only</SelectItem>
-                    <SelectItem value="team">Anyone on the team</SelectItem>
-                    <SelectItem value="public">Public link</SelectItem>
-                  </SelectContent>
-                </Select>
-              </Field>
+            <CardContent className="space-y-4">
+              <p className="text-sm leading-6 text-muted-foreground">
+                The popup includes room name, team, deck, visibility, voting
+                mode, and a live preview so facilitators can sanity-check the
+                setup before starting.
+              </p>
+              <div className="rounded-2xl border bg-muted/20 p-4">
+                <PreviewRow
+                  icon={DoorOpen}
+                  label="Default room"
+                  value="Sprint 24 Planning"
+                />
+              </div>
             </CardContent>
             <CardFooter className="gap-3">
-              <Button>
-                Start room
-                <ArrowRight className="size-4" />
-              </Button>
-              <Button variant="outline">Save as template</Button>
+              <CreateRoomDialog
+                trigger={
+                  <Button>
+                    Open setup dialog
+                    <ArrowRight className="size-4" />
+                  </Button>
+                }
+              />
+              <Button variant="outline">Browse templates</Button>
             </CardFooter>
           </Card>
 
           <Card className="border-border/70">
             <CardHeader>
-              <CardTitle>Active rooms</CardTitle>
+              <CardTitle>Available rooms</CardTitle>
               <CardDescription>
-                Rooms your team can continue right away.
+                Open sessions your team can join or continue right away.
               </CardDescription>
             </CardHeader>
-            <CardContent className="grid gap-4">
-              {activeRooms.map((room) => (
+            <CardContent className="space-y-4">
+              <div className="flex flex-col gap-3 rounded-2xl border bg-muted/20 p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="space-y-1">
+                  <p className="text-sm font-medium">Browse open sessions</p>
+                  <p className="text-sm text-muted-foreground">
+                    Find rooms with active voting, ongoing discussion, or
+                    estimates ready to reveal.
+                  </p>
+                </div>
+                <div className="inline-flex items-center gap-2 rounded-full border bg-background px-3 py-2 text-sm text-muted-foreground">
+                  <Search className="size-4" />
+                  {openRooms.length} rooms available
+                </div>
+              </div>
+
+              {openRooms.map((room) => (
                 <div
                   key={room.name}
-                  className="rounded-2xl border bg-background px-4 py-4"
+                  className="rounded-2xl border bg-background px-4 py-4 transition-colors hover:bg-muted/20"
                 >
                   <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
                     <div className="space-y-2">
@@ -211,11 +204,40 @@ export default function RoomsPage() {
                       <div className="flex flex-wrap gap-2">
                         <MetaPill icon={Layers3}>{room.deck}</MetaPill>
                         <MetaPill icon={Lock}>{room.visibility}</MetaPill>
+                        <MetaPill icon={Users}>{room.participants}</MetaPill>
+                      </div>
+                      <div className="flex flex-wrap gap-x-5 gap-y-2 text-sm text-muted-foreground">
+                        <span>Host: {room.host}</span>
+                        <span>{room.lastActivity}</span>
                       </div>
                     </div>
 
                     <div className="flex flex-col items-start gap-3 lg:items-end">
-                      <StatusPill>{room.status}</StatusPill>
+                      <div className="flex w-full items-center justify-between gap-2 lg:w-auto lg:justify-end">
+                        <StatusPill>{room.status}</StatusPill>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button variant="ghost" size="icon-sm" aria-label="Room actions">
+                              <MoreHorizontal className="size-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end" className="w-44">
+                            <DropdownMenuItem>
+                              <Pencil className="size-4" />
+                              Edit room
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Archive className="size-4" />
+                              Archive room
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem variant="destructive">
+                              <Trash2 className="size-4" />
+                              Delete room
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
                       <Button variant="outline" size="sm">
                         Open room
                       </Button>
@@ -309,15 +331,6 @@ export default function RoomsPage() {
         </div>
       </div>
     </section>
-  )
-}
-
-function Field({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <label className="grid gap-2 text-sm">
-      <span className="font-medium">{label}</span>
-      {children}
-    </label>
   )
 }
 

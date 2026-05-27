@@ -15,10 +15,10 @@ import {
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from "../ui/sidebar"
+} from "@/common/ui/sidebar"
 import { NavMain } from "./nav-main"
 import { NavUser } from "./nav-user"
-import { TeamSwitcher } from "./team-switcher"
+import { TeamSwitcher } from "@/common/components/team-switcher"
 
 const data = {
   user: {

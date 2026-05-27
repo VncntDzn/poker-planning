@@ -8,7 +8,7 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "../ui/sidebar"
+} from "@/common/ui/sidebar"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
@@ -21,8 +21,6 @@ interface ItemProps {
 
 export function NavMain({ items }: { items: ItemProps[] }) {
   const pathname = usePathname()
-
-  console.log(pathname)
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Platform</SidebarGroupLabel>
