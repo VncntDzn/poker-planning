@@ -2,6 +2,7 @@ import type { ElementType, ReactNode } from "react"
 
 import { ArrowRight, Check, Clock3, Layers3, Plus, Users } from "lucide-react"
 
+import { CreateRoomDialog } from "@/common/components/dialogs/create-room"
 import { Button } from "@/common/ui/button"
 import {
   Card,
@@ -119,10 +120,14 @@ export default function DashboardPage() {
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row">
-            <Button>
-              Create room
-              <Plus className="size-4" />
-            </Button>
+            <CreateRoomDialog
+              trigger={
+                <Button>
+                  Create room
+                  <Plus className="size-4" />
+                </Button>
+              }
+            />
             <Button variant="outline">
               View recent sessions
               <ArrowRight className="size-4" />
@@ -236,10 +241,14 @@ export default function DashboardPage() {
               ))}
             </CardContent>
             <CardFooter className="flex-col items-stretch gap-3">
-              <Button className="w-full">
-                Start new planning room
-                <ArrowRight className="size-4" />
-              </Button>
+              <CreateRoomDialog
+                trigger={
+                  <Button className="w-full">
+                    Start new planning room
+                    <ArrowRight className="size-4" />
+                  </Button>
+                }
+              />
               <Button variant="outline" className="w-full">
                 Review team cadence
               </Button>

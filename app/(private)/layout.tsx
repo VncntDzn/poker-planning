@@ -1,5 +1,5 @@
-import { AppSidebar } from "@/common/components/app-sidebar"
-import { PrivateBreadcrumbs } from "@/common/components/private-breadcrumbs"
+import { AppSidebar } from "@/common/components/nav/app-sidebar"
+import { PrivateBreadcrumbs } from "@/common/components/nav/private-breadcrumbs"
 import { Separator } from "@/common/ui/separator"
 import {
   SidebarInset,
