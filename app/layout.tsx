@@ -1,10 +1,8 @@
-import { Geist, Geist_Mono, Montserrat } from "next/font/google"
+import { Geist_Mono, Montserrat } from "next/font/google"
 
-import "./globals.css"
-import { ThemeProvider } from "@/core/providers/theme-provider"
+import { AppProviders } from "@/core/providers/app-providers"
 import { cn } from "@/lib/utils"
-import { GoogleOAuthProvider } from "@react-oauth/google"
-import { TooltipProvider } from "@/common/ui/tooltip"
+import "./globals.css"
 
 const montserrat = Montserrat({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -30,13 +28,7 @@ export default function RootLayout({
       )}
     >
       <body>
-        <GoogleOAuthProvider
-          clientId={process.env.NEXT_PUBLIC_API_GOOGLE_CLIENT_ID as string}
-        >
-          <TooltipProvider>
-            <ThemeProvider>{children}</ThemeProvider>
-          </TooltipProvider>
-        </GoogleOAuthProvider>
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   )
