@@ -43,9 +43,11 @@ export function NavProjects({
       <SidebarMenu>
         {projects.map((item) => (
           <SidebarMenuItem key={item.name}>
-            <SidebarMenuButton render={<Link href={item.url} />}>
-              <item.icon />
-              <span>{item.name}</span>
+            <SidebarMenuButton asChild>
+              <Link href={item.url}>
+                <item.icon />
+                <span>{item.name}</span>
+              </Link>
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
