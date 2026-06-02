@@ -14,7 +14,6 @@ import {
   Users,
 } from "lucide-react"
 
-import { CreateRoomDialog } from "@/common/components/dialogs/create-room"
 import { Button } from "@/common/ui/button"
 import {
   Card,
@@ -31,6 +30,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/common/ui/dropdown-menu"
+import { CreateRoomDialog } from "./_components/create-room"
 
 const openRooms = [
   {
@@ -165,14 +165,7 @@ export default function RoomsPage() {
               </p>
             </CardContent>
             <CardFooter className="gap-3">
-              <CreateRoomDialog
-                trigger={
-                  <Button>
-                    Open setup dialog
-                    <ArrowRight className="size-4" />
-                  </Button>
-                }
-              />
+              <CreateRoomDialog />
               <Button variant="outline">Browse templates</Button>
             </CardFooter>
           </Card>
@@ -228,7 +221,11 @@ export default function RoomsPage() {
                         <StatusPill>{room.status}</StatusPill>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon-sm" aria-label="Room actions">
+                            <Button
+                              variant="ghost"
+                              size="icon-sm"
+                              aria-label="Room actions"
+                            >
                               <MoreHorizontal className="size-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -258,7 +255,6 @@ export default function RoomsPage() {
               ))}
             </CardContent>
           </Card>
-
         </div>
 
         <div className="space-y-6">
