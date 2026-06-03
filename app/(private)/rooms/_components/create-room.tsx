@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ArrowRight } from "lucide-react"
-import { useId } from "react"
+import { useEffect, useId, useState } from "react"
 import { Controller, useForm } from "react-hook-form"
 import type * as z from "zod"
 
@@ -26,7 +26,6 @@ import {
   SelectValue,
 } from "@/common/ui/select"
 import { createRoomSchema } from "../_schemas/create-room.schema"
-import { PreviewRoom } from "./preview-room"
 import { DeckType, RoomVisibility, VoteMode } from "../_types/preview-room"
 import { useCreateRoom } from "../_services/use-create-room"
 
@@ -65,6 +64,7 @@ const defaultValues: CreateRoomFormValues = {
 }
 
 export function CreateRoomDialog() {
+  const [open, setOpen] = useState(false)
   const roomNameId = useId()
   const teamId = useId()
   const { mutate: createRoom, isPending } = useCreateRoom()
@@ -72,234 +72,215 @@ export function CreateRoomDialog() {
   const {
     control,
     handleSubmit,
-    watch,
+    reset,
     formState: { errors },
   } = useForm<CreateRoomFormValues, undefined, CreateRoomSubmitValues>({
     resolver: zodResolver(createRoomSchema),
     defaultValues,
   })
 
-  const previewValues = watch()
+  useEffect(() => {
+    if (!open) {
+      reset(defaultValues)
+    }
+  }, [open, reset])
 
   const handleCreateRoom = (values: CreateRoomSubmitValues) => {
     createRoom(values)
+    setOpen(false)
   }
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
           Create room
           <ArrowRight className="size-4" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-h-[90vh] overflow-y-auto border-border/70 p-0 sm:max-w-4xl">
-        <div className="grid md:grid-cols-[minmax(0,1fr)_320px]">
-          <section className="p-6 sm:p-7">
-            <DialogHeader className="gap-2 border-b border-border/70 pb-5 text-left">
-              <DialogTitle className="text-xl">Create room</DialogTitle>
-              <DialogDescription className="max-w-xl text-sm leading-6">
-                Set up a planning room for your next estimation session.
-              </DialogDescription>
-            </DialogHeader>
+      <DialogContent className="max-h-[90vh] overflow-y-auto border-border/70 p-0 sm:max-w-2xl">
+        <section className="p-6 sm:p-7">
+          <DialogHeader className="gap-2 border-b border-border/70 pb-5 text-left">
+            <DialogTitle className="text-xl">Create room</DialogTitle>
+            <DialogDescription className="max-w-xl text-sm leading-6">
+              Set up a planning room for your next estimation session.
+            </DialogDescription>
+          </DialogHeader>
 
-            <form onSubmit={handleSubmit(handleCreateRoom)}>
-              <div className="grid gap-6 py-6">
-                <div className="grid gap-5 md:grid-cols-2">
-                  <Field>
-                    <FieldLabel htmlFor={roomNameId}>Room name</FieldLabel>
-                    <Controller
-                      name="roomName"
-                      control={control}
-                      render={({ field }) => (
-                        <Input
-                          {...field}
-                          id={roomNameId}
-                          value={field.value ?? ""}
-                          placeholder="Sprint 24 planning"
-                          className="h-10"
-                          aria-invalid={!!errors.roomName}
-                        />
-                      )}
-                    />
-                    <FieldError errors={[errors.roomName]} />
-                  </Field>
+          <form onSubmit={handleSubmit(handleCreateRoom)}>
+            <div className="grid gap-6 py-6">
+              <div className="grid gap-5 md:grid-cols-2">
+                <Field>
+                  <FieldLabel htmlFor={roomNameId}>Room name</FieldLabel>
+                  <Controller
+                    name="roomName"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        id={roomNameId}
+                        value={field.value ?? ""}
+                        placeholder="Sprint 24 planning"
+                        className="h-10"
+                        aria-invalid={!!errors.roomName}
+                      />
+                    )}
+                  />
+                  <FieldError errors={[errors.roomName]} />
+                </Field>
 
-                  <Field>
-                    <FieldLabel htmlFor={teamId}>Team</FieldLabel>
-                    <Controller
-                      name="team"
-                      control={control}
-                      render={({ field }) => (
-                        <Input
-                          {...field}
-                          id={teamId}
-                          value={field.value ?? ""}
-                          placeholder="Core Product Squad"
-                          className="h-10"
-                          aria-invalid={!!errors.team}
-                        />
-                      )}
-                    />
-                    <FieldError errors={[errors.team]} />
-                  </Field>
-                </div>
-
-                <div className="grid gap-5 md:grid-cols-2">
-                  <Field>
-                    <FieldLabel>Deck</FieldLabel>
-                    <Controller
-                      name="deck"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger
-                            className="h-10 w-full"
-                            aria-invalid={!!errors.deck}
-                          >
-                            <SelectValue placeholder="Choose a deck" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {deckOptions.map((option) => (
-                              <SelectItem
-                                key={option.value}
-                                value={option.value}
-                              >
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    <FieldError errors={[errors.deck]} />
-                  </Field>
-
-                  <Field>
-                    <FieldLabel>Visibility</FieldLabel>
-                    <Controller
-                      name="roomVisibility"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger
-                            className="h-10 w-full"
-                            aria-invalid={!!errors.roomVisibility}
-                          >
-                            <SelectValue placeholder="Select visibility" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {roomVisibilityOptions.map((option) => (
-                              <SelectItem
-                                key={option.value}
-                                value={option.value}
-                              >
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    <FieldError errors={[errors.roomVisibility]} />
-                  </Field>
-                </div>
-
-                <div className="grid gap-5 md:grid-cols-2">
-                  <Field>
-                    <FieldLabel>Voting mode</FieldLabel>
-                    <Controller
-                      name="voteMode"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          value={field.value}
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger
-                            className="h-10 w-full"
-                            aria-invalid={!!errors.voteMode}
-                          >
-                            <SelectValue placeholder="Choose voting mode" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {modeOptions.map((option) => (
-                              <SelectItem
-                                key={option.value}
-                                value={option.value}
-                              >
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    <FieldError errors={[errors.voteMode]} />
-                  </Field>
-
-                  <Field>
-                    <FieldLabel>Participants</FieldLabel>
-                    <Controller
-                      name="numOfParticipants"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          value={String(field.value ?? "")}
-                          onValueChange={field.onChange}
-                        >
-                          <SelectTrigger
-                            className="h-10 w-full"
-                            aria-invalid={!!errors.numOfParticipants}
-                          >
-                            <SelectValue placeholder="Choose participant cap" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {participantOptions.map((option) => (
-                              <SelectItem
-                                key={option.value}
-                                value={option.value}
-                              >
-                                {option.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
-                    <FieldError errors={[errors.numOfParticipants]} />
-                  </Field>
-                </div>
+                <Field>
+                  <FieldLabel htmlFor={teamId}>Team</FieldLabel>
+                  <Controller
+                    name="team"
+                    control={control}
+                    render={({ field }) => (
+                      <Input
+                        {...field}
+                        id={teamId}
+                        value={field.value ?? ""}
+                        placeholder="Core Product Squad"
+                        className="h-10"
+                        aria-invalid={!!errors.team}
+                      />
+                    )}
+                  />
+                  <FieldError errors={[errors.team]} />
+                </Field>
               </div>
 
-              <DialogFooter className="border-t border-border/70 pt-5 sm:justify-between">
+              <div className="grid gap-5 md:grid-cols-2">
+                <Field>
+                  <FieldLabel>Deck</FieldLabel>
+                  <Controller
+                    name="deck"
+                    control={control}
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger
+                          className="h-10 w-full"
+                          aria-invalid={!!errors.deck}
+                        >
+                          <SelectValue placeholder="Choose a deck" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {deckOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  <FieldError errors={[errors.deck]} />
+                </Field>
+
+                <Field>
+                  <FieldLabel>Visibility</FieldLabel>
+                  <Controller
+                    name="roomVisibility"
+                    control={control}
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger
+                          className="h-10 w-full"
+                          aria-invalid={!!errors.roomVisibility}
+                        >
+                          <SelectValue placeholder="Select visibility" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {roomVisibilityOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  <FieldError errors={[errors.roomVisibility]} />
+                </Field>
+              </div>
+
+              <div className="grid gap-5 md:grid-cols-2">
+                <Field>
+                  <FieldLabel>Voting mode</FieldLabel>
+                  <Controller
+                    name="voteMode"
+                    control={control}
+                    render={({ field }) => (
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger
+                          className="h-10 w-full"
+                          aria-invalid={!!errors.voteMode}
+                        >
+                          <SelectValue placeholder="Choose voting mode" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {modeOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  <FieldError errors={[errors.voteMode]} />
+                </Field>
+
+                <Field>
+                  <FieldLabel>Participants</FieldLabel>
+                  <Controller
+                    name="numOfParticipants"
+                    control={control}
+                    render={({ field }) => (
+                      <Select
+                        value={String(field.value ?? "")}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger
+                          className="h-10 w-full"
+                          aria-invalid={!!errors.numOfParticipants}
+                        >
+                          <SelectValue placeholder="Choose participant cap" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {participantOptions.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
+                  <FieldError errors={[errors.numOfParticipants]} />
+                </Field>
+              </div>
+            </div>
+
+            <DialogFooter className="border-t border-border/70 pt-5 sm:justify-between">
+              <p className="text-sm text-muted-foreground">
+                Rooms created here follow the same lightweight setup flow as teams.
+              </p>
+              <div className="flex flex-col-reverse gap-2 sm:flex-row">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setOpen(false)}
+                >
+                  Cancel
+                </Button>
                 <Button type="submit" disabled={isPending}>
                   {isPending ? "Creating..." : "Create room"}
                   <ArrowRight className="size-4" />
                 </Button>
-              </DialogFooter>
-            </form>
-          </section>
-
-          <PreviewRoom
-            team={previewValues.team ?? ""}
-            roomName={previewValues.roomName ?? ""}
-            selectedDeck={previewValues.deck ?? deckOptions[0].value}
-            selectedVoteMode={previewValues.voteMode ?? modeOptions[0].value}
-            numOfParticipants={String(
-              previewValues.numOfParticipants ?? participantOptions[0].value
-            )}
-            roomVisibility={
-              previewValues.roomVisibility ?? roomVisibilityOptions[0].value
-            }
-          />
-        </div>
+              </div>
+            </DialogFooter>
+          </form>
+        </section>
       </DialogContent>
     </Dialog>
   )
