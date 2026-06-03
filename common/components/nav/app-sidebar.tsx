@@ -6,6 +6,7 @@ import {
   Command,
   GalleryVerticalEnd,
   SquareTerminal,
+  Users,
 } from "lucide-react"
 import * as React from "react"
 
@@ -54,6 +55,11 @@ const data = {
       title: "Rooms",
       url: "/rooms",
       icon: Bot,
+    },
+    {
+      title: "Teams",
+      url: "/teams",
+      icon: Users,
     },
   ],
 }

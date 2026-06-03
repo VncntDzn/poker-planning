@@ -1,8 +1,19 @@
 "use client"
 
 import * as React from "react"
-import { ChevronsUpDown, Plus } from "lucide-react"
+import {
+  AudioWaveform,
+  Bot,
+  ChevronsUpDown,
+  GalleryVerticalEnd,
+  Plus,
+  SquareTerminal,
+} from "lucide-react"
 
+import {
+  CreateProjectDialog,
+  type CreateProjectPayload,
+} from "@/common/components/create-project-dialog"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,7 +40,27 @@ export function TeamSwitcher({
   }[]
 }) {
   const { isMobile } = useSidebar()
+  const [availableTeams, setAvailableTeams] = React.useState(teams)
   const [activeTeam, setActiveTeam] = React.useState(teams[0])
+  const [isCreateProjectOpen, setIsCreateProjectOpen] = React.useState(false)
+
+  const teamLogos = {
+    product: SquareTerminal,
+    growth: AudioWaveform,
+    platform: Bot,
+    design: GalleryVerticalEnd,
+  } as const
+
+  const handleCreateProject = (values: CreateProjectPayload) => {
+    const nextTeam = {
+      name: values.name,
+      plan: values.plan,
+      logo: teamLogos[values.kind],
+    }
+
+    setAvailableTeams((currentTeams) => [...currentTeams, nextTeam])
+    setActiveTeam(nextTeam)
+  }
 
   if (!activeTeam) {
     return null
@@ -61,9 +92,9 @@ export function TeamSwitcher({
             sideOffset={4}
           >
             <DropdownMenuLabel className="text-xs text-muted-foreground">
-              Teams
+              Projects
             </DropdownMenuLabel>
-            {teams.map((team, index) => (
+            {availableTeams.map((team, index) => (
               <DropdownMenuItem
                 key={team.name}
                 onClick={() => setActiveTeam(team)}
@@ -77,14 +108,23 @@ export function TeamSwitcher({
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-2 p-2">
+            <DropdownMenuItem
+              className="gap-2 p-2"
+              onSelect={() => setIsCreateProjectOpen(true)}
+            >
               <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
                 <Plus className="size-4" />
               </div>
-              <div className="font-medium text-muted-foreground">Add team</div>
+              <div className="font-medium text-muted-foreground">Add project</div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
+        <CreateProjectDialog
+          open={isCreateProjectOpen}
+          onOpenChange={setIsCreateProjectOpen}
+          onCreateProject={handleCreateProject}
+          existingProjectNames={availableTeams.map((team) => team.name)}
+        />
       </SidebarMenuItem>
     </SidebarMenu>
   )
