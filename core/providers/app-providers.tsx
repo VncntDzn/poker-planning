@@ -7,6 +7,7 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 
 import { TooltipProvider } from "@/common/ui/tooltip"
 import { ThemeProvider } from "@/core/providers/theme-provider"
+import { Toaster } from "sonner"
 
 type AppProvidersProps = Readonly<{
   children: React.ReactNode
@@ -23,7 +24,7 @@ export function AppProviders({ children }: AppProvidersProps) {
         <TooltipProvider>
           <ThemeProvider>{children}</ThemeProvider>
         </TooltipProvider>
-
+        <Toaster />
         <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
     </GoogleOAuthProvider>
